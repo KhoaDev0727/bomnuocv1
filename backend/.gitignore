@@ -31,3 +31,16 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Environment & Secrets ###
+.env
+.env.local
+*.env
+*.key
+*.pem
+
+### Firebase & Cloud Credentials ###
+serviceAccountKey.json
+**/serviceAccountKey*.json
+*firebase-adminsdk*.json
+src/main/resources/serviceAccountKey.json
