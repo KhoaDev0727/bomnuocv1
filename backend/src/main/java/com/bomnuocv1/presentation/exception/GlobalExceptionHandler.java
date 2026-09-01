@@ -6,6 +6,7 @@ import com.bomnuocv1.domain.exception.InvalidPinException;
 import com.bomnuocv1.domain.exception.InvalidTokenException;
 import com.bomnuocv1.domain.exception.OtpVerificationException;
 import com.bomnuocv1.domain.exception.PhoneAlreadyExistsException;
+import com.bomnuocv1.domain.exception.PricingRuleNotFoundException;
 import com.bomnuocv1.domain.exception.RoleNotFoundException;
 import com.bomnuocv1.domain.exception.UnauthorizedException;
 import com.bomnuocv1.domain.exception.UserNotFoundException;
@@ -31,10 +32,10 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.CONFLICT, "Phone Already Exists", ex.getMessage());
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ApiErrorResponse> handleUserNotFound(UserNotFoundException ex) {
-        log.warn("User not found: {}", ex.getMessage());
-        return buildResponse(HttpStatus.NOT_FOUND, "User Not Found", ex.getMessage());
+    @ExceptionHandler({UserNotFoundException.class, PricingRuleNotFoundException.class})
+    public ResponseEntity<ApiErrorResponse> handleNotFound(DomainException ex) {
+        log.warn("Resource not found: {}", ex.getMessage());
+        return buildResponse(HttpStatus.NOT_FOUND, "Not Found", ex.getMessage());
     }
 
     @ExceptionHandler({InvalidPinException.class, InvalidTokenException.class, UnauthorizedException.class})

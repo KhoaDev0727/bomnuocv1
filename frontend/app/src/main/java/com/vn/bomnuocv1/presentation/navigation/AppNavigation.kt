@@ -10,7 +10,9 @@ import androidx.navigation.navArgument
 import com.vn.bomnuocv1.presentation.home.HomeScreen
 import com.vn.bomnuocv1.presentation.login.LoginScreen
 import com.vn.bomnuocv1.presentation.otp.OtpScreen
+import com.vn.bomnuocv1.presentation.pricing.PricingScreen
 import com.vn.bomnuocv1.presentation.register.RegisterScreen
+import com.vn.bomnuocv1.presentation.settings.SettingsScreen
 import com.vn.bomnuocv1.presentation.splash.SplashScreen
 
 @Composable
@@ -124,6 +126,36 @@ fun AppNavigation(
 
         composable(Screen.Home.route) {
             HomeScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                },
+                onNavigateToPricing = {
+                    navController.navigate(Screen.Pricing.route)
+                },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Settings.route)
+                }
+            )
+        }
+
+        composable(Screen.Pricing.route) {
+            PricingScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Screen.Settings.route) {
+            SettingsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToPricing = {
+                    navController.navigate(Screen.Pricing.route)
+                },
                 onNavigateToLogin = {
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Home.route) { inclusive = true }

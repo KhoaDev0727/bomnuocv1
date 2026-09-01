@@ -84,14 +84,14 @@ fun BrandLogoBadge(
 ) {
     Surface(
         modifier = modifier.size(size),
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(0.dp),
         color = AgriMintContainer,
         border = BorderStroke(1.2.dp, AgriMintBorder)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp),
+                .padding(0.dp),
             contentAlignment = Alignment.Center
         ) {
             Image(

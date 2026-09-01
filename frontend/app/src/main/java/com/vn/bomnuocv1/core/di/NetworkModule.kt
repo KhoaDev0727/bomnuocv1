@@ -4,6 +4,8 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.vn.bomnuocv1.core.network.AuthInterceptor
 import com.vn.bomnuocv1.data.remote.api.AuthApiService
+import com.vn.bomnuocv1.data.remote.api.DashboardApiService
+import com.vn.bomnuocv1.data.remote.api.PricingApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -59,5 +61,17 @@ object NetworkModule {
     @Singleton
     fun provideAuthApiService(retrofit: Retrofit): AuthApiService {
         return retrofit.create(AuthApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providePricingApiService(retrofit: Retrofit): PricingApiService {
+        return retrofit.create(PricingApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDashboardApiService(retrofit: Retrofit): DashboardApiService {
+        return retrofit.create(DashboardApiService::class.java)
     }
 }
