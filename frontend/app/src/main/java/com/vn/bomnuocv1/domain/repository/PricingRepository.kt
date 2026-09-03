@@ -17,5 +17,7 @@ interface PricingRepository {
         effectiveFrom: String?
     ): Result<PricingRule>
 
+    suspend fun deletePricingRule(id: String): Result<Unit>
+
     suspend fun getLandUnitOptions(): Result<List<LandUnitOption>>
 }

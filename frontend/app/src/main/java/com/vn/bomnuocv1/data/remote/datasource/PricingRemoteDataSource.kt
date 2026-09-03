@@ -45,6 +45,13 @@ class PricingRemoteDataSource @Inject constructor(
         throw Exception(response.body()?.message ?: "Không thể thiết lập đơn giá.")
     }
 
+    suspend fun deletePricingRule(id: String) {
+        val response = apiService.deletePricingRule(id)
+        if (!response.isSuccessful) {
+            throw Exception(response.body()?.message ?: "Không thể xóa đơn giá.")
+        }
+    }
+
     suspend fun getLandUnitOptions(): List<LandUnitOptionDto> {
         val response = apiService.getLandUnitOptions()
         if (response.isSuccessful && response.body()?.data != null) {

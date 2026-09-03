@@ -7,10 +7,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.vn.bomnuocv1.presentation.debtledger.DebtLedgerScreen
+import com.vn.bomnuocv1.presentation.home.HomeBottomTab
 import com.vn.bomnuocv1.presentation.home.HomeScreen
 import com.vn.bomnuocv1.presentation.login.LoginScreen
 import com.vn.bomnuocv1.presentation.otp.OtpScreen
 import com.vn.bomnuocv1.presentation.pricing.PricingScreen
+import com.vn.bomnuocv1.presentation.pumplog.PumpLogScreen
 import com.vn.bomnuocv1.presentation.register.RegisterScreen
 import com.vn.bomnuocv1.presentation.settings.SettingsScreen
 import com.vn.bomnuocv1.presentation.splash.SplashScreen
@@ -19,6 +22,22 @@ import com.vn.bomnuocv1.presentation.splash.SplashScreen
 fun AppNavigation(
     navController: NavHostController = rememberNavController()
 ) {
+    val navigateToBottomTab: (HomeBottomTab) -> Unit = { tab ->
+        val targetRoute = when (tab) {
+            HomeBottomTab.HOME -> Screen.Home.route
+            HomeBottomTab.PUMP_LOG -> Screen.PumpLog.route
+            HomeBottomTab.DEBT_LEDGER -> Screen.DebtLedger.route
+            HomeBottomTab.SETTINGS -> Screen.Settings.route
+        }
+        navController.navigate(targetRoute) {
+            popUpTo(Screen.Home.route) {
+                saveState = true
+            }
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = Screen.Splash.route
@@ -135,8 +154,26 @@ fun AppNavigation(
                     navController.navigate(Screen.Pricing.route)
                 },
                 onNavigateToSettings = {
-                    navController.navigate(Screen.Settings.route)
+                    navigateToBottomTab(HomeBottomTab.SETTINGS)
+                },
+                onNavigateToPumpLog = {
+                    navigateToBottomTab(HomeBottomTab.PUMP_LOG)
+                },
+                onNavigateToDebtLedger = {
+                    navigateToBottomTab(HomeBottomTab.DEBT_LEDGER)
                 }
+            )
+        }
+
+        composable(Screen.PumpLog.route) {
+            PumpLogScreen(
+                onTabSelected = navigateToBottomTab
+            )
+        }
+
+        composable(Screen.DebtLedger.route) {
+            DebtLedgerScreen(
+                onTabSelected = navigateToBottomTab
             )
         }
 
@@ -150,9 +187,6 @@ fun AppNavigation(
 
         composable(Screen.Settings.route) {
             SettingsScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
                 onNavigateToPricing = {
                     navController.navigate(Screen.Pricing.route)
                 },
@@ -160,7 +194,8 @@ fun AppNavigation(
                     navController.navigate(Screen.Login.route) {
                         popUpTo(Screen.Home.route) { inclusive = true }
                     }
-                }
+                },
+                onTabSelected = navigateToBottomTab
             )
         }
     }

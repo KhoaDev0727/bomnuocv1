@@ -24,5 +24,14 @@ data class PricingUiState(
     val showEditDialog: Boolean = false,
     val editingPricingType: String = "per_area",
     val editingUnitLabel: String = "công nhỏ (1.000m²)",
-    val editingPriceInput: String = "90000"
+    val editingPriceInput: String = "90000",
+
+    // Delete confirmation dialog state
+    val rulePendingDelete: PricingRule? = null,
+    val isDeleting: Boolean = false,
+
+    // Expandable sections
+    val isLandUnitGuideExpanded: Boolean = false,
+    val isHistoryExpanded: Boolean = false,
+    val isActiveRulesExpanded: Boolean = false
 )

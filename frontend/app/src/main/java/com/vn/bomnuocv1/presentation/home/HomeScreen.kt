@@ -66,6 +66,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vn.bomnuocv1.domain.model.RecentTransaction
+import com.vn.bomnuocv1.presentation.common.AppBottomNavigationBar
 import com.vn.bomnuocv1.presentation.common.OfflineStatusBadge
 import com.vn.bomnuocv1.ui.theme.AgriBackground
 import com.vn.bomnuocv1.ui.theme.AgriCardBorder
@@ -80,6 +81,8 @@ fun HomeScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToPricing: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
+    onNavigateToPumpLog: () -> Unit = {},
+    onNavigateToDebtLedger: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -100,13 +103,14 @@ fun HomeScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            HomeBottomNavigationBar(
-                selectedTab = uiState.selectedTab,
+            AppBottomNavigationBar(
+                selectedTab = HomeBottomTab.HOME,
                 onTabSelected = { tab ->
-                    if (tab == HomeBottomTab.SETTINGS) {
-                        onNavigateToSettings()
-                    } else {
-                        viewModel.onTabSelected(tab)
+                    when (tab) {
+                        HomeBottomTab.HOME -> { /* Already on Home */ }
+                        HomeBottomTab.PUMP_LOG -> onNavigateToPumpLog()
+                        HomeBottomTab.DEBT_LEDGER -> onNavigateToDebtLedger()
+                        HomeBottomTab.SETTINGS -> onNavigateToSettings()
                     }
                 }
             )
@@ -592,115 +596,5 @@ private fun TransactionItemRow(item: RecentTransaction) {
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun HomeBottomNavigationBar(
-    selectedTab: HomeBottomTab,
-    onTabSelected: (HomeBottomTab) -> Unit
-) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .navigationBarsPadding(),
-        color = Color.White,
-        shadowElevation = 8.dp,
-        border = androidx.compose.foundation.BorderStroke(1.dp, AgriCardBorder.copy(alpha = 0.6f))
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Tab 1: Trang chủ (Active capsule)
-            if (selectedTab == HomeBottomTab.HOME) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(AgriGreenPrimary)
-                        .clickable { onTabSelected(HomeBottomTab.HOME) }
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Home,
-                            contentDescription = "Trang chủ",
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "Trang chủ",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
-                }
-            } else {
-                BottomNavItem(
-                    icon = Icons.Outlined.Home,
-                    label = "Trang chủ",
-                    selected = false,
-                    onClick = { onTabSelected(HomeBottomTab.HOME) }
-                )
-            }
-
-            // Tab 2: Lượt bơm
-            BottomNavItem(
-                icon = Icons.Outlined.WaterDrop,
-                label = "Lượt bơm",
-                selected = selectedTab == HomeBottomTab.PUMP_LOG,
-                onClick = { onTabSelected(HomeBottomTab.PUMP_LOG) }
-            )
-
-            // Tab 3: Sổ nợ
-            BottomNavItem(
-                icon = Icons.Outlined.AutoStories,
-                label = "Sổ nợ",
-                selected = selectedTab == HomeBottomTab.DEBT_LEDGER,
-                onClick = { onTabSelected(HomeBottomTab.DEBT_LEDGER) }
-            )
-
-            // Tab 4: Cài đặt
-            BottomNavItem(
-                icon = Icons.Outlined.Settings,
-                label = "Cài đặt",
-                selected = selectedTab == HomeBottomTab.SETTINGS,
-                onClick = { onTabSelected(HomeBottomTab.SETTINGS) }
-            )
-        }
-    }
-}
-
-@Composable
-private fun BottomNavItem(
-    icon: ImageVector,
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .clickable(onClick = onClick)
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = if (selected) AgriGreenPrimary else Color(0xFF64748B),
-            modifier = Modifier.size(22.dp)
-            )
-        Spacer(modifier = Modifier.height(2.dp))
-        Text(
-            text = label,
-            fontSize = 12.sp,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-            color = if (selected) AgriGreenPrimary else Color(0xFF64748B)
-        )
     }
 }

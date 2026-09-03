@@ -56,4 +56,15 @@ public class PricingRuleRepositoryAdapter implements PricingRuleRepository {
     public Optional<PricingRule> findActiveByOwnerIdAndPricingType(UUID ownerId, PricingType pricingType) {
         return pricingRuleJpaRepository.findActiveByOwnerIdAndPricingType(ownerId, pricingType.getCode()).map(mapper::toDomain);
     }
+
+    @Override
+    public void delete(PricingRule pricingRule) {
+        PricingRuleJpaEntity entity = mapper.toEntity(pricingRule);
+        pricingRuleJpaRepository.delete(entity);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        pricingRuleJpaRepository.deleteById(id);
+    }
 }

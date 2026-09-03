@@ -20,4 +20,8 @@ public interface PricingRuleRepository {
     Optional<PricingRule> findActiveByOwnerIdAndUnitLabel(UUID ownerId, String unitLabel);
 
     Optional<PricingRule> findActiveByOwnerIdAndPricingType(UUID ownerId, PricingType pricingType);
+
+    void delete(PricingRule pricingRule);
+
+    void deleteById(UUID id);
 }

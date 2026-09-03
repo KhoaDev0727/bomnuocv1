@@ -3,6 +3,7 @@ package com.bomnuocv1.presentation.controller;
 import com.bomnuocv1.application.dto.LandUnitOptionResult;
 import com.bomnuocv1.application.dto.PricingRuleResult;
 import com.bomnuocv1.application.port.in.SavePricingRuleCommand;
+import com.bomnuocv1.application.usecase.DeletePricingRuleUseCase;
 import com.bomnuocv1.application.usecase.GetActivePricingRulesUseCase;
 import com.bomnuocv1.application.usecase.GetAllPricingRulesUseCase;
 import com.bomnuocv1.application.usecase.GetLandUnitOptionsUseCase;
@@ -18,7 +19,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +37,7 @@ import java.util.stream.Collectors;
 public class PricingRuleController {
 
     private final SavePricingRuleUseCase savePricingRuleUseCase;
+    private final DeletePricingRuleUseCase deletePricingRuleUseCase;
     private final GetActivePricingRulesUseCase getActivePricingRulesUseCase;
     private final GetAllPricingRulesUseCase getAllPricingRulesUseCase;
     private final GetLandUnitOptionsUseCase getLandUnitOptionsUseCase;
@@ -76,6 +80,13 @@ public class PricingRuleController {
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách quy chuẩn đơn vị thành công!", response));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deletePricingRule(@PathVariable("id") UUID id) {
+        UUID currentUserId = getCurrentUserId();
+        deletePricingRuleUseCase.execute(id, currentUserId);
+        return ResponseEntity.ok(ApiResponse.success("Xóa đơn giá thành công!", null));
     }
 
     private UUID getCurrentUserId() {

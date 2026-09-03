@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.vn.bomnuocv1.domain.model.LandUnitOption
 import com.vn.bomnuocv1.domain.model.PricingRule
 import com.vn.bomnuocv1.domain.model.PricingType
+import com.vn.bomnuocv1.domain.usecase.DeletePricingRuleUseCase
 import com.vn.bomnuocv1.domain.usecase.GetActivePricingRulesUseCase
 import com.vn.bomnuocv1.domain.usecase.GetAllPricingRulesUseCase
 import com.vn.bomnuocv1.domain.usecase.GetLandUnitOptionsUseCase
@@ -26,7 +27,8 @@ class PricingViewModel @Inject constructor(
     private val getActivePricingRulesUseCase: GetActivePricingRulesUseCase,
     private val getAllPricingRulesUseCase: GetAllPricingRulesUseCase,
     private val getLandUnitOptionsUseCase: GetLandUnitOptionsUseCase,
-    private val savePricingRuleUseCase: SavePricingRuleUseCase
+    private val savePricingRuleUseCase: SavePricingRuleUseCase,
+    private val deletePricingRuleUseCase: DeletePricingRuleUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PricingUiState(isLoading = true))
@@ -184,6 +186,52 @@ class PricingViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun requestDeletePricingRule(rule: PricingRule) {
+        _uiState.update { it.copy(rulePendingDelete = rule) }
+    }
+
+    fun dismissDeleteConfirmation() {
+        _uiState.update { it.copy(rulePendingDelete = null) }
+    }
+
+    fun confirmDeletePricingRule() {
+        val rule = _uiState.value.rulePendingDelete ?: return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isDeleting = true, errorMessage = null) }
+            val result = deletePricingRuleUseCase(rule.id)
+            result.onSuccess {
+                _uiState.update {
+                    it.copy(
+                        isDeleting = false,
+                        rulePendingDelete = null,
+                        successMessage = "Đã xóa đơn giá '${rule.unitLabel}' thành công!"
+                    )
+                }
+                loadData()
+            }.onFailure { error ->
+                _uiState.update {
+                    it.copy(
+                        isDeleting = false,
+                        rulePendingDelete = null,
+                        errorMessage = error.message ?: "Không thể xóa đơn giá."
+                    )
+                }
+            }
+        }
+    }
+
+    fun toggleLandUnitGuide() {
+        _uiState.update { it.copy(isLandUnitGuideExpanded = !it.isLandUnitGuideExpanded) }
+    }
+
+    fun toggleHistoryExpanded() {
+        _uiState.update { it.copy(isHistoryExpanded = !it.isHistoryExpanded) }
+    }
+
+    fun toggleActiveRulesExpanded() {
+        _uiState.update { it.copy(isActiveRulesExpanded = !it.isActiveRulesExpanded) }
     }
 
     fun clearMessages() {

@@ -44,6 +44,15 @@ class PricingRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun deletePricingRule(id: String): Result<Unit> {
+        return try {
+            remoteDataSource.deletePricingRule(id)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     override suspend fun getLandUnitOptions(): Result<List<LandUnitOption>> {
         return try {
             val dtos = remoteDataSource.getLandUnitOptions()

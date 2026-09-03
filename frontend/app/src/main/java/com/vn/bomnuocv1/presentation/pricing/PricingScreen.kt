@@ -1,5 +1,11 @@
 package com.vn.bomnuocv1.presentation.pricing
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,12 +34,17 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.PriceChange
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -120,6 +131,15 @@ fun PricingScreen(
             onAddStepClick = viewModel::addQuickPriceStep,
             onDismiss = viewModel::dismissEditDialog,
             onSave = viewModel::savePricingRule
+        )
+    }
+
+    uiState.rulePendingDelete?.let { ruleToDelete ->
+        DeleteConfirmationDialog(
+            rule = ruleToDelete,
+            isDeleting = uiState.isDeleting,
+            onConfirm = viewModel::confirmDeletePricingRule,
+            onDismiss = viewModel::dismissDeleteConfirmation
         )
     }
 
@@ -226,12 +246,44 @@ fun PricingScreen(
                         )
                     }
 
-                    activeList.forEach { rule ->
+                    val visibleActiveRules = if (!uiState.isActiveRulesExpanded && activeList.size > 3) {
+                        activeList.take(3)
+                    } else {
+                        activeList
+                    }
+
+                    visibleActiveRules.forEach { rule ->
                         ActivePricingRateCard(
                             rule = rule,
-                            onEditClick = { viewModel.openEditDialog(rule) }
+                            onEditClick = { viewModel.openEditDialog(rule) },
+                            onDeleteClick = { viewModel.requestDeletePricingRule(rule) }
                         )
                         Spacer(modifier = Modifier.height(10.dp))
+                    }
+
+                    if (activeList.size > 3) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            TextButton(onClick = viewModel::toggleActiveRulesExpanded) {
+                                Text(
+                                    text = if (uiState.isActiveRulesExpanded) "Thu gọn bớt" else "Xem thêm ${activeList.size - 3} đơn giá khác",
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = AgriGreenPrimary
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Icon(
+                                    imageVector = if (uiState.isActiveRulesExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                    contentDescription = null,
+                                    tint = AgriGreenPrimary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -374,46 +426,97 @@ fun PricingScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // 4. Educational Knowledge Card (Công tầm nhỏ vs Công tầm lớn)
+                // 4. Educational Knowledge Card (Công tầm nhỏ vs Công tầm lớn - Collapsible Accordion)
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable { viewModel.toggleLandUnitGuide() },
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)),
                     border = CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(AgriCardBorder))
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.Info,
-                                contentDescription = null,
-                                tint = Color(0xFF0284C7),
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Phân biệt Công tầm nhỏ & Công tầm lớn",
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF0F172A)
-                            )
+                    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFFE0F2FE)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Info,
+                                        contentDescription = null,
+                                        tint = Color(0xFF0284C7),
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Text(
+                                    text = "Phân biệt Công tầm nhỏ & Công tầm lớn",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF0F172A)
+                                )
+                            }
+
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Surface(
+                                    color = if (uiState.isLandUnitGuideExpanded) Color(0xFFE0F2FE) else Color(0xFFF1F5F9),
+                                    shape = RoundedCornerShape(20.dp)
+                                ) {
+                                    Text(
+                                        text = if (uiState.isLandUnitGuideExpanded) "Đóng" else "Tìm hiểu",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = if (uiState.isLandUnitGuideExpanded) Color(0xFF0284C7) else Color(0xFF64748B),
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Icon(
+                                    imageVector = if (uiState.isLandUnitGuideExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                    contentDescription = null,
+                                    tint = Color(0xFF64748B),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
                         }
 
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        Text(
-                            text = "• Công tầm nhỏ (1.000 m²): Là đơn vị chuẩn đo lường phổ biến ở Nam Bộ.\n" +
-                                    "• Công tầm lớn (1.296 m² - 1.440 m²): Dùng phổ biến ở miền Tây (Kiên Giang, An Giang, Cà Mau...), tính theo tầm cấy 3m (144 tầm vuông = 1.296 m²) hoặc tầm 3m25 (~1.440 m²).\n" +
-                                    "• Hệ thống tự động nhân diện tích với đơn giá để ghi nợ chính xác, tránh nhầm lẫn.",
-                            fontSize = 13.sp,
-                            color = Color(0xFF475569),
-                            lineHeight = 20.sp
-                        )
+                        AnimatedVisibility(
+                            visible = uiState.isLandUnitGuideExpanded,
+                            enter = fadeIn() + expandVertically(),
+                            exit = fadeOut() + shrinkVertically()
+                        ) {
+                            Column {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                HorizontalDivider(color = AgriCardBorder.copy(alpha = 0.5f), thickness = 1.dp)
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Text(
+                                    text = "• Công tầm nhỏ (1.000 m²): Là đơn vị chuẩn đo lường phổ biến ở Nam Bộ.\n" +
+                                            "• Công tầm lớn (1.296 m² - 1.440 m²): Dùng phổ biến ở miền Tây (Kiên Giang, An Giang, Cà Mau...), tính theo tầm cấy 3m (144 tầm vuông = 1.296 m²) hoặc tầm 3m25 (~1.440 m²).\n" +
+                                            "• Hệ thống tự động nhân diện tích với đơn giá để ghi nợ chính xác, tránh nhầm lẫn.",
+                                    fontSize = 13.sp,
+                                    color = Color(0xFF475569),
+                                    lineHeight = 20.sp
+                                )
+                            }
+                        }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // 5. Pricing Change History Section
+                // 5. Pricing Change History Section (Collapsible if > 3 rows)
                 if (uiState.allRules.isNotEmpty()) {
                     Text(
                         text = "Lịch sử thay đổi đơn giá",
@@ -424,6 +527,12 @@ fun PricingScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    val displayedHistory = if (!uiState.isHistoryExpanded && uiState.allRules.size > 3) {
+                        uiState.allRules.take(3)
+                    } else {
+                        uiState.allRules
+                    }
+
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp),
@@ -431,10 +540,35 @@ fun PricingScreen(
                         border = CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(AgriCardBorder))
                     ) {
                         Column(modifier = Modifier.fillMaxWidth()) {
-                            uiState.allRules.forEachIndexed { index, rule ->
+                            displayedHistory.forEachIndexed { index, rule ->
                                 PricingHistoryRow(rule = rule)
-                                if (index < uiState.allRules.size - 1) {
+                                if (index < displayedHistory.size - 1 || uiState.allRules.size > 3) {
                                     HorizontalDivider(color = AgriCardBorder.copy(alpha = 0.5f), thickness = 1.dp)
+                                }
+                            }
+
+                            if (uiState.allRules.size > 3) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable { viewModel.toggleHistoryExpanded() }
+                                        .padding(vertical = 12.dp),
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = if (uiState.isHistoryExpanded) "Thu gọn lịch sử" else "Xem tất cả lịch sử (${uiState.allRules.size})",
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = AgriGreenPrimary
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Icon(
+                                        imageVector = if (uiState.isHistoryExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                        contentDescription = null,
+                                        tint = AgriGreenPrimary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
                                 }
                             }
                         }
@@ -450,7 +584,8 @@ fun PricingScreen(
 @Composable
 private fun ActivePricingRateCard(
     rule: PricingRule,
-    onEditClick: () -> Unit
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -461,11 +596,14 @@ private fun ActivePricingRateCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp),
+                .padding(horizontal = 14.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f, fill = false)
+            ) {
                 Box(
                     modifier = Modifier
                         .size(38.dp)
@@ -481,48 +619,160 @@ private fun ActivePricingRateCard(
                     )
                 }
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(10.dp))
 
                 Column {
                     Text(
                         text = rule.unitLabel,
-                        fontSize = 15.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF0F172A)
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "Áp dụng từ: ${rule.effectiveFrom}",
-                        fontSize = 12.sp,
+                        fontSize = 11.sp,
                         color = Color(0xFF64748B)
                     )
                 }
             }
 
+            Spacer(modifier = Modifier.width(8.dp))
+
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = rule.formattedUnitPrice,
-                    fontSize = 17.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = AgriGreenPrimary
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                IconButton(
-                    onClick = onEditClick,
-                    modifier = Modifier.size(32.dp)
+                // Action buttons container [ Edit | Delete ]
+                Surface(
+                    color = Color(0xFFF8FAFC),
+                    shape = RoundedCornerShape(10.dp),
+                    border = BorderStroke(1.dp, AgriCardBorder.copy(alpha = 0.8f))
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Chỉnh sửa",
-                        tint = Color(0xFF64748B),
-                        modifier = Modifier.size(18.dp)
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 2.dp, vertical = 2.dp)
+                    ) {
+                        IconButton(
+                            onClick = onEditClick,
+                            modifier = Modifier.size(28.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Chỉnh sửa đơn giá",
+                                tint = Color(0xFF475569),
+                                modifier = Modifier.size(15.dp)
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .width(1.dp)
+                                .height(14.dp)
+                                .background(AgriCardBorder)
+                        )
+
+                        IconButton(
+                            onClick = onDeleteClick,
+                            modifier = Modifier.size(28.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.DeleteOutline,
+                                contentDescription = "Xóa đơn giá",
+                                tint = Color(0xFFEF4444),
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun DeleteConfirmationDialog(
+    rule: PricingRule,
+    isDeleting: Boolean,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = {
+            Box(
+                modifier = Modifier
+                    .size(46.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFFEE2E2)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.DeleteOutline,
+                    contentDescription = null,
+                    tint = Color(0xFFDC2626),
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        },
+        title = {
+            Text(
+                text = "Xác nhận xóa đơn giá",
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF0F172A),
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        text = {
+            Text(
+                text = "Bạn có chắc chắn muốn xóa đơn giá \"${rule.unitLabel}\" (${rule.formattedUnitPrice})? Thao tác này sẽ gỡ bỏ đơn giá khỏi danh sách áp dụng.",
+                fontSize = 13.sp,
+                color = Color(0xFF475569),
+                textAlign = TextAlign.Center,
+                lineHeight = 19.sp,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                enabled = !isDeleting,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFDC2626),
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                if (isDeleting) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text("Xóa", fontWeight = FontWeight.Bold)
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss,
+                enabled = !isDeleting
+            ) {
+                Text("Hủy", color = Color(0xFF64748B))
+            }
+        },
+        containerColor = Color.White,
+        shape = RoundedCornerShape(18.dp)
+    )
 }
 
 @Composable
@@ -712,16 +962,32 @@ private fun PricingEditDialog(
             }
         },
         confirmButton = {
-            AgriButton(
-                text = "Lưu đơn giá",
-                onClick = onSave,
-                isLoading = isSaving,
-                modifier = Modifier.padding(horizontal = 8.dp)
-            )
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss, enabled = !isSaving) {
-                Text("Hủy", color = Color(0xFF64748B))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                AgriButton(
+                    text = "Lưu đơn giá",
+                    onClick = onSave,
+                    isLoading = isSaving,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                TextButton(
+                    onClick = onDismiss,
+                    enabled = !isSaving,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Hủy",
+                        color = Color(0xFF64748B),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
     )

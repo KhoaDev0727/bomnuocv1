@@ -49,6 +49,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vn.bomnuocv1.presentation.common.AgriButton
+import com.vn.bomnuocv1.presentation.common.AppBottomNavigationBar
+import com.vn.bomnuocv1.presentation.home.HomeBottomTab
 import com.vn.bomnuocv1.ui.theme.AgriBackground
 import com.vn.bomnuocv1.ui.theme.AgriCardBorder
 import com.vn.bomnuocv1.ui.theme.AgriError
@@ -58,9 +60,10 @@ import com.vn.bomnuocv1.ui.theme.AgriGreenPrimaryContainer
 
 @Composable
 fun SettingsScreen(
-    onNavigateBack: () -> Unit,
     onNavigateToPricing: () -> Unit,
     onNavigateToLogin: () -> Unit,
+    onTabSelected: (HomeBottomTab) -> Unit,
+    onNavigateBack: (() -> Unit)? = null,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -72,6 +75,12 @@ fun SettingsScreen(
     }
 
     Scaffold(
+        bottomBar = {
+            AppBottomNavigationBar(
+                selectedTab = HomeBottomTab.SETTINGS,
+                onTabSelected = onTabSelected
+            )
+        },
         containerColor = AgriBackground
     ) { innerPadding ->
         Column(
@@ -81,24 +90,14 @@ fun SettingsScreen(
                 .background(AgriBackground)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Top Bar
+            // Top Bar without back arrow
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .statusBarsPadding()
-                    .padding(horizontal = 8.dp, vertical = 8.dp),
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onNavigateBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Quay lại",
-                        tint = Color(0xFF0F172A)
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(4.dp))
-
                 Text(
                     text = "Cài đặt hệ thống",
                     fontSize = 20.sp,
