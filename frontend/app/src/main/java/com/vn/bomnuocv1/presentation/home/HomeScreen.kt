@@ -80,6 +80,7 @@ import com.vn.bomnuocv1.ui.theme.AgriMintContainer
 fun HomeScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToPricing: () -> Unit = {},
+    onNavigateToFarmers: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
     onNavigateToPumpLog: () -> Unit = {},
     onNavigateToDebtLedger: () -> Unit = {},
@@ -208,7 +209,7 @@ fun HomeScreen(
                         icon = Icons.Outlined.PersonAddAlt1,
                         iconTint = AgriGreenPrimary,
                         text = "Thêm\nnông dân",
-                        onClick = { /* Nav to add farmer */ }
+                        onClick = onNavigateToFarmers
                     )
                 }
 

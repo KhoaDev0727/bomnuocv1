@@ -14,5 +14,11 @@ public interface FarmerRepository {
 
     List<Farmer> findByOwnerId(UUID ownerId);
 
+    List<Farmer> searchByOwnerId(UUID ownerId, String keyword);
+
+    boolean existsByOwnerIdAndPhoneNumber(UUID ownerId, String phoneNumber);
+
+    boolean existsByOwnerIdAndPhoneNumberAndIdNot(UUID ownerId, String phoneNumber, UUID excludeId);
+
     long countByOwnerId(UUID ownerId);
 }

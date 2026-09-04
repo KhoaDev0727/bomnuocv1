@@ -34,12 +34,14 @@ public class Farmer {
 
     public static Farmer createNew(UUID ownerId, String fullName, String phoneNumber, String areaNote, UUID clientUuid) {
         Instant now = Instant.now();
+        String trimmedPhone = (phoneNumber != null && !phoneNumber.trim().isEmpty()) ? phoneNumber.trim() : null;
+        String trimmedArea = (areaNote != null && !areaNote.trim().isEmpty()) ? areaNote.trim() : null;
         return Farmer.builder()
                 .id(UUID.randomUUID())
                 .ownerId(ownerId)
                 .fullName(fullName != null ? fullName.trim() : "")
-                .phoneNumber(phoneNumber)
-                .areaNote(areaNote)
+                .phoneNumber(trimmedPhone)
+                .areaNote(trimmedArea)
                 .deleted(false)
                 .clientUuid(clientUuid)
                 .createdAt(now)
@@ -51,8 +53,8 @@ public class Farmer {
         if (fullName != null && !fullName.trim().isEmpty()) {
             this.fullName = fullName.trim();
         }
-        this.phoneNumber = phoneNumber;
-        this.areaNote = areaNote;
+        this.phoneNumber = (phoneNumber != null && !phoneNumber.trim().isEmpty()) ? phoneNumber.trim() : null;
+        this.areaNote = (areaNote != null && !areaNote.trim().isEmpty()) ? areaNote.trim() : null;
         this.updatedAt = Instant.now();
     }
 

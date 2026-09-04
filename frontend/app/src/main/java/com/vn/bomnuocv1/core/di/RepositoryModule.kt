@@ -33,5 +33,11 @@ abstract class RepositoryModule {
     abstract fun bindDashboardRepository(
         dashboardRepositoryImpl: DashboardRepositoryImpl
     ): DashboardRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFarmerRepository(
+        farmerRepositoryImpl: com.vn.bomnuocv1.data.repository.FarmerRepositoryImpl
+    ): com.vn.bomnuocv1.domain.repository.FarmerRepository
 }
 

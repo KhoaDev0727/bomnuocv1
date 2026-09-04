@@ -153,6 +153,9 @@ fun AppNavigation(
                 onNavigateToPricing = {
                     navController.navigate(Screen.Pricing.route)
                 },
+                onNavigateToFarmers = {
+                    navController.navigate(Screen.Farmers.route)
+                },
                 onNavigateToSettings = {
                     navigateToBottomTab(HomeBottomTab.SETTINGS)
                 },
@@ -185,10 +188,21 @@ fun AppNavigation(
             )
         }
 
+        composable(Screen.Farmers.route) {
+            com.vn.bomnuocv1.presentation.farmers.FarmerListScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
         composable(Screen.Settings.route) {
             SettingsScreen(
                 onNavigateToPricing = {
                     navController.navigate(Screen.Pricing.route)
+                },
+                onNavigateToFarmers = {
+                    navController.navigate(Screen.Farmers.route)
                 },
                 onNavigateToLogin = {
                     navController.navigate(Screen.Login.route) {

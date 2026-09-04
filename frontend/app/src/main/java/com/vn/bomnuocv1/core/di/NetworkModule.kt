@@ -74,4 +74,10 @@ object NetworkModule {
     fun provideDashboardApiService(retrofit: Retrofit): DashboardApiService {
         return retrofit.create(DashboardApiService::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideFarmerApiService(retrofit: Retrofit): com.vn.bomnuocv1.data.remote.api.FarmerApiService {
+        return retrofit.create(com.vn.bomnuocv1.data.remote.api.FarmerApiService::class.java)
+    }
 }

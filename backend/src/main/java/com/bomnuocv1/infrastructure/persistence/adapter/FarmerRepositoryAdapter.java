@@ -40,6 +40,30 @@ public class FarmerRepositoryAdapter implements FarmerRepository {
     }
 
     @Override
+    public List<Farmer> searchByOwnerId(UUID ownerId, String keyword) {
+        String queryKeyword = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
+        return farmerJpaRepository.searchActiveByOwnerId(ownerId, queryKeyword).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean existsByOwnerIdAndPhoneNumber(UUID ownerId, String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+            return false;
+        }
+        return farmerJpaRepository.existsActiveByOwnerIdAndPhoneNumber(ownerId, phoneNumber.trim());
+    }
+
+    @Override
+    public boolean existsByOwnerIdAndPhoneNumberAndIdNot(UUID ownerId, String phoneNumber, UUID excludeId) {
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+            return false;
+        }
+        return farmerJpaRepository.existsActiveByOwnerIdAndPhoneNumberAndIdNot(ownerId, phoneNumber.trim(), excludeId);
+    }
+
+    @Override
     public long countByOwnerId(UUID ownerId) {
         return farmerJpaRepository.countActiveByOwnerId(ownerId);
     }

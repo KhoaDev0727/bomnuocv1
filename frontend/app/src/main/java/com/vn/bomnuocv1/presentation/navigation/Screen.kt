@@ -23,6 +23,7 @@ sealed class Screen(val route: String) {
     data object PumpLog : Screen("pump_log")
     data object DebtLedger : Screen("debt_ledger")
     data object Pricing : Screen("pricing")
+    data object Farmers : Screen("farmers")
     data object Settings : Screen("settings")
 }
 

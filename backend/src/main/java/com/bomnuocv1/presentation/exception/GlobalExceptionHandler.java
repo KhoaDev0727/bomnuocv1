@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.CONFLICT, "Phone Already Exists", ex.getMessage());
     }
 
-    @ExceptionHandler({UserNotFoundException.class, PricingRuleNotFoundException.class})
+    @ExceptionHandler({UserNotFoundException.class, PricingRuleNotFoundException.class, com.bomnuocv1.domain.exception.FarmerNotFoundException.class})
     public ResponseEntity<ApiErrorResponse> handleNotFound(DomainException ex) {
         log.warn("Resource not found: {}", ex.getMessage());
         return buildResponse(HttpStatus.NOT_FOUND, "Not Found", ex.getMessage());

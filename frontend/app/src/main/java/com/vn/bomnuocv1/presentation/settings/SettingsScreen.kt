@@ -61,6 +61,7 @@ import com.vn.bomnuocv1.ui.theme.AgriGreenPrimaryContainer
 @Composable
 fun SettingsScreen(
     onNavigateToPricing: () -> Unit,
+    onNavigateToFarmers: () -> Unit = {},
     onNavigateToLogin: () -> Unit,
     onTabSelected: (HomeBottomTab) -> Unit,
     onNavigateBack: (() -> Unit)? = null,
@@ -197,6 +198,17 @@ fun SettingsScreen(
                             title = "Thiết lập đơn giá bơm",
                             subtitle = "Quản lý giá theo công nhỏ, công lớn, hecta, giờ",
                             onClick = onNavigateToPricing
+                        )
+
+                        HorizontalDivider(color = AgriCardBorder.copy(alpha = 0.5f), thickness = 1.dp)
+
+                        // Setting Item: Danh mục nông dân
+                        SettingNavigationRow(
+                            icon = Icons.Default.AccountCircle,
+                            iconTint = AgriGreenPrimary,
+                            title = "Danh mục nông dân",
+                            subtitle = "Quản lý danh sách khách hàng, thửa ruộng, số điện thoại",
+                            onClick = onNavigateToFarmers
                         )
 
                         HorizontalDivider(color = AgriCardBorder.copy(alpha = 0.5f), thickness = 1.dp)
