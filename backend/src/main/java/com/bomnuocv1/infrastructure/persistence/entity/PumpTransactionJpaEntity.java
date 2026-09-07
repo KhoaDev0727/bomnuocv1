@@ -49,7 +49,7 @@ public class PumpTransactionJpaEntity {
     @Column(name = "unit_price", nullable = false, precision = 12, scale = 2)
     private BigDecimal unitPrice;
 
-    @Column(name = "amount_due", precision = 12, scale = 2)
+    @Column(name = "amount_due", nullable = false, precision = 12, scale = 2)
     private BigDecimal amountDue;
 
     @Column(name = "note", columnDefinition = "TEXT")

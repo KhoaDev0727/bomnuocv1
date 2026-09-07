@@ -15,5 +15,7 @@ public interface PumpTransactionRepository {
 
     List<PumpTransaction> findByOwnerId(UUID ownerId);
 
+    List<PumpTransaction> findByOwnerIdAndFarmerId(UUID ownerId, UUID farmerId);
+
     long countTodayPumpsByOwnerId(UUID ownerId, LocalDate today);
 }

@@ -51,7 +51,8 @@ class AuthPreferences @Inject constructor(
         }
         .map { preferences ->
             val isLoggedIn = preferences[KEY_IS_LOGGED_IN] ?: false
-            if (isLoggedIn) {
+            val accessToken = preferences[KEY_ACCESS_TOKEN]
+            if (isLoggedIn && !com.vn.bomnuocv1.core.network.JwtHelper.isExpired(accessToken)) {
                 val userId = preferences[KEY_USER_ID] ?: ""
                 val phone = preferences[KEY_USER_PHONE] ?: ""
                 val name = preferences[KEY_USER_FULL_NAME] ?: ""
@@ -115,6 +116,12 @@ class AuthPreferences @Inject constructor(
         val prefs = context.dataStore.data.firstOrNull() ?: return SessionInfo(false)
         val isLoggedIn = prefs[KEY_IS_LOGGED_IN] ?: false
         if (!isLoggedIn) return SessionInfo(false)
+
+        val accessToken = prefs[KEY_ACCESS_TOKEN]
+        if (com.vn.bomnuocv1.core.network.JwtHelper.isExpired(accessToken)) {
+            clearSession()
+            return SessionInfo(isLoggedIn = false)
+        }
 
         val userId = prefs[KEY_USER_ID] ?: ""
         val phone = prefs[KEY_USER_PHONE] ?: ""

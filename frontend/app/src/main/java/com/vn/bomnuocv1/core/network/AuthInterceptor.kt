@@ -9,7 +9,8 @@ import javax.inject.Singleton
 
 @Singleton
 class AuthInterceptor @Inject constructor(
-    private val authPreferences: AuthPreferences
+    private val authPreferences: AuthPreferences,
+    private val sessionManager: SessionManager
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -17,12 +18,13 @@ class AuthInterceptor @Inject constructor(
 
         // Skip auth header for authentication public endpoints
         val path = originalRequest.url.encodedPath
-        if (path.contains("/auth/login-pin") ||
+        val isPublicAuthEndpoint = path.contains("/auth/login-pin") ||
             path.contains("/auth/register") ||
             path.contains("/auth/send-otp") ||
             path.contains("/auth/verify-otp") ||
             path.contains("/auth/refresh-token")
-        ) {
+
+        if (isPublicAuthEndpoint) {
             return chain.proceed(originalRequest)
         }
 
@@ -35,6 +37,16 @@ class AuthInterceptor @Inject constructor(
             originalRequest
         }
 
-        return chain.proceed(authenticatedRequest)
+        val response = chain.proceed(authenticatedRequest)
+
+        // If backend returns 401 Unauthorized, the session has expired or token is invalid
+        if (response.code == 401) {
+            runBlocking {
+                authPreferences.clearSession()
+            }
+            sessionManager.triggerSessionExpired("Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại.")
+        }
+
+        return response
     }
 }

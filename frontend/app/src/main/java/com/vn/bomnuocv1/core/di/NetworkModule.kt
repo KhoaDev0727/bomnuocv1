@@ -80,4 +80,16 @@ object NetworkModule {
     fun provideFarmerApiService(retrofit: Retrofit): com.vn.bomnuocv1.data.remote.api.FarmerApiService {
         return retrofit.create(com.vn.bomnuocv1.data.remote.api.FarmerApiService::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun providePumpTransactionApiService(retrofit: Retrofit): com.vn.bomnuocv1.data.remote.api.PumpTransactionApiService {
+        return retrofit.create(com.vn.bomnuocv1.data.remote.api.PumpTransactionApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun providePaymentApiService(retrofit: Retrofit): com.vn.bomnuocv1.data.remote.api.PaymentApiService {
+        return retrofit.create(com.vn.bomnuocv1.data.remote.api.PaymentApiService::class.java)
+    }
 }

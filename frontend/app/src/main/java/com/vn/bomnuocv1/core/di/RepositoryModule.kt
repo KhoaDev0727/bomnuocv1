@@ -39,5 +39,17 @@ abstract class RepositoryModule {
     abstract fun bindFarmerRepository(
         farmerRepositoryImpl: com.vn.bomnuocv1.data.repository.FarmerRepositoryImpl
     ): com.vn.bomnuocv1.domain.repository.FarmerRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPumpTransactionRepository(
+        pumpTransactionRepositoryImpl: com.vn.bomnuocv1.data.repository.PumpTransactionRepositoryImpl
+    ): com.vn.bomnuocv1.domain.repository.PumpTransactionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPaymentRepository(
+        paymentRepositoryImpl: com.vn.bomnuocv1.data.repository.PaymentRepositoryImpl
+    ): com.vn.bomnuocv1.domain.repository.PaymentRepository
 }
 

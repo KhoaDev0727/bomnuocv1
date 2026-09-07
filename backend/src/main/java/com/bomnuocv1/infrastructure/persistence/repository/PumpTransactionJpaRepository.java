@@ -14,8 +14,11 @@ import java.util.UUID;
 @Repository
 public interface PumpTransactionJpaRepository extends JpaRepository<PumpTransactionJpaEntity, UUID> {
 
-    @Query("SELECT t FROM PumpTransactionJpaEntity t WHERE t.ownerId = :ownerId AND t.deleted = false ORDER BY t.createdAt DESC")
+    @Query("SELECT t FROM PumpTransactionJpaEntity t WHERE t.ownerId = :ownerId AND t.deleted = false ORDER BY t.transactionDate DESC, t.createdAt DESC")
     List<PumpTransactionJpaEntity> findActiveByOwnerId(@Param("ownerId") UUID ownerId);
+
+    @Query("SELECT t FROM PumpTransactionJpaEntity t WHERE t.ownerId = :ownerId AND t.farmerId = :farmerId AND t.deleted = false ORDER BY t.transactionDate DESC, t.createdAt DESC")
+    List<PumpTransactionJpaEntity> findActiveByOwnerIdAndFarmerId(@Param("ownerId") UUID ownerId, @Param("farmerId") UUID farmerId);
 
     @Query("SELECT COUNT(t) FROM PumpTransactionJpaEntity t WHERE t.ownerId = :ownerId AND t.transactionDate = :today AND t.deleted = false")
     long countTodayPumpsByOwnerId(@Param("ownerId") UUID ownerId, @Param("today") LocalDate today);
@@ -23,6 +26,6 @@ public interface PumpTransactionJpaRepository extends JpaRepository<PumpTransact
     @Query("SELECT COALESCE(SUM(t.amountDue), 0) FROM PumpTransactionJpaEntity t WHERE t.ownerId = :ownerId AND t.deleted = false")
     BigDecimal sumTotalDueByOwnerId(@Param("ownerId") UUID ownerId);
 
-    @Query("SELECT t FROM PumpTransactionJpaEntity t WHERE t.ownerId = :ownerId AND t.deleted = false ORDER BY t.createdAt DESC")
+    @Query("SELECT t FROM PumpTransactionJpaEntity t WHERE t.ownerId = :ownerId AND t.deleted = false ORDER BY t.transactionDate DESC, t.createdAt DESC")
     List<PumpTransactionJpaEntity> findTop10ByOwnerId(@Param("ownerId") UUID ownerId);
 }

@@ -19,8 +19,10 @@ public class PaymentPersistenceMapper {
                 .amount(entity.getAmount())
                 .paymentDate(entity.getPaymentDate())
                 .note(entity.getNote())
+                .deleted(entity.isDeleted())
                 .clientUuid(entity.getClientUuid())
                 .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 
@@ -36,8 +38,10 @@ public class PaymentPersistenceMapper {
                 .amount(domain.getAmount())
                 .paymentDate(domain.getPaymentDate())
                 .note(domain.getNote())
+                .deleted(domain.isDeleted())
                 .clientUuid(domain.getClientUuid())
                 .createdAt(domain.getCreatedAt())
+                .updatedAt(domain.getUpdatedAt())
                 .build();
     }
 }

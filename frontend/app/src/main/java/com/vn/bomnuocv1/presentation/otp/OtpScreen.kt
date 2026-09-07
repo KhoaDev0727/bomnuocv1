@@ -42,6 +42,7 @@ import com.vn.bomnuocv1.presentation.common.AgriInputField
 import com.vn.bomnuocv1.presentation.common.AgriPrimaryButton
 import com.vn.bomnuocv1.presentation.common.BrandLogoBadge
 import com.vn.bomnuocv1.presentation.common.OtpDigitBoxes
+import com.vn.bomnuocv1.presentation.common.clearFocusOnTap
 import com.vn.bomnuocv1.ui.theme.AgriBackground
 import com.vn.bomnuocv1.ui.theme.AgriError
 import com.vn.bomnuocv1.ui.theme.AgriGreenDark
@@ -88,6 +89,7 @@ fun OtpScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(AgriBackground)
+            .clearFocusOnTap()
             .imePadding()
     ) {
         val minHeight = maxHeight

@@ -59,6 +59,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vn.bomnuocv1.domain.model.Farmer
 import com.vn.bomnuocv1.presentation.common.AgriButton
+import com.vn.bomnuocv1.presentation.common.clearFocusOnTap
 import com.vn.bomnuocv1.presentation.farmers.components.DeleteFarmerConfirmDialog
 import com.vn.bomnuocv1.presentation.farmers.components.FarmerFormDialog
 import com.vn.bomnuocv1.ui.theme.AgriBackground
@@ -100,6 +101,7 @@ fun FarmerListScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(AgriBackground)
+                .clearFocusOnTap()
         ) {
             // 1. Top Header Bar
             FarmerTopBar(

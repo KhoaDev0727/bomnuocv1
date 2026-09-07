@@ -66,15 +66,18 @@ public class DashboardRepositoryAdapter implements DashboardRepository {
         for (PumpTransactionJpaEntity pump : pumpList) {
             String farmerName = farmerNames.getOrDefault(pump.getFarmerId(), "Nông dân");
             String timeStr = formatInstant(pump.getCreatedAt(), timeFormatter, dateFormatter);
+            BigDecimal pumpDue = pump.getAmountDue() != null
+                    ? pump.getAmountDue()
+                    : (pump.getQuantity() != null && pump.getUnitPrice() != null ? pump.getQuantity().multiply(pump.getUnitPrice()) : BigDecimal.ZERO);
             String details = "Bơm " + formatQuantity(pump.getQuantity()) + " " + pump.getQuantityUnit() + " • " + timeStr;
-            String formattedAmount = "+ " + currencyFormat.format(pump.getAmountDue()) + "đ";
+            String formattedAmount = "+ " + currencyFormat.format(pumpDue) + "đ";
 
             recentList.add(RecentTransaction.builder()
                     .id(pump.getId())
                     .type("PUMP")
                     .farmerName(farmerName)
                     .details(details)
-                    .amount(pump.getAmountDue())
+                    .amount(pumpDue)
                     .formattedAmount(formattedAmount)
                     .statusBadge("Ghi nợ")
                     .createdAt(pump.getCreatedAt())

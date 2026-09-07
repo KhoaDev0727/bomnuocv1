@@ -19,10 +19,12 @@ public class Payment {
     private final BigDecimal amount;
     private final LocalDate paymentDate;
     private final String note;
+    private boolean deleted;
     private final UUID clientUuid;
     private final Instant createdAt;
+    private Instant updatedAt;
 
-    public Payment(UUID id, UUID ownerId, UUID farmerId, UUID transactionId, BigDecimal amount, LocalDate paymentDate, String note, UUID clientUuid, Instant createdAt) {
+    public Payment(UUID id, UUID ownerId, UUID farmerId, UUID transactionId, BigDecimal amount, LocalDate paymentDate, String note, boolean deleted, UUID clientUuid, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.ownerId = ownerId;
         this.farmerId = farmerId;
@@ -30,8 +32,10 @@ public class Payment {
         this.amount = amount;
         this.paymentDate = paymentDate != null ? paymentDate : LocalDate.now();
         this.note = note;
+        this.deleted = deleted;
         this.clientUuid = clientUuid;
         this.createdAt = createdAt != null ? createdAt : Instant.now();
+        this.updatedAt = updatedAt != null ? updatedAt : Instant.now();
     }
 
     public static Payment createNew(
@@ -43,6 +47,7 @@ public class Payment {
             String note,
             UUID clientUuid
     ) {
+        Instant now = Instant.now();
         return Payment.builder()
                 .id(UUID.randomUUID())
                 .ownerId(ownerId)
@@ -51,8 +56,15 @@ public class Payment {
                 .amount(amount)
                 .paymentDate(paymentDate != null ? paymentDate : LocalDate.now())
                 .note(note)
+                .deleted(false)
                 .clientUuid(clientUuid)
-                .createdAt(Instant.now())
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
+    }
+
+    public void markDeleted() {
+        this.deleted = true;
+        this.updatedAt = Instant.now();
     }
 }

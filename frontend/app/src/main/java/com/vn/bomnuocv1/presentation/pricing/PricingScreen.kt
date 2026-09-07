@@ -85,6 +85,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vn.bomnuocv1.domain.model.LandUnitOption
 import com.vn.bomnuocv1.domain.model.PricingRule
 import com.vn.bomnuocv1.presentation.common.AgriButton
+import com.vn.bomnuocv1.presentation.common.clearFocusOnTap
 import com.vn.bomnuocv1.ui.theme.AgriBackground
 import com.vn.bomnuocv1.ui.theme.AgriCardBorder
 import com.vn.bomnuocv1.ui.theme.AgriGreenDark
@@ -152,6 +153,7 @@ fun PricingScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(AgriBackground)
+                .clearFocusOnTap()
                 .verticalScroll(rememberScrollState())
         ) {
             // 1. Top Bar

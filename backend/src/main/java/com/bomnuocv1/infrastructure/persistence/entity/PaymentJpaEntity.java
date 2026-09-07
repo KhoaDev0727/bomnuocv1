@@ -46,9 +46,15 @@ public class PaymentJpaEntity {
     @Column(name = "note", columnDefinition = "TEXT")
     private String note;
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean deleted;
+
     @Column(name = "client_uuid")
     private UUID clientUuid;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 }

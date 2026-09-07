@@ -41,6 +41,13 @@ public class PumpTransactionRepositoryAdapter implements PumpTransactionReposito
     }
 
     @Override
+    public List<PumpTransaction> findByOwnerIdAndFarmerId(UUID ownerId, UUID farmerId) {
+        return pumpTransactionJpaRepository.findActiveByOwnerIdAndFarmerId(ownerId, farmerId).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public long countTodayPumpsByOwnerId(UUID ownerId, LocalDate today) {
         return pumpTransactionJpaRepository.countTodayPumpsByOwnerId(ownerId, today);
     }

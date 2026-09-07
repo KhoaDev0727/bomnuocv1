@@ -52,6 +52,8 @@ import com.vn.bomnuocv1.ui.theme.AgriGreenPrimary
 import com.vn.bomnuocv1.ui.theme.AgriMintBorder
 import com.vn.bomnuocv1.ui.theme.AgriMintContainer
 
+import com.vn.bomnuocv1.presentation.common.clearFocusOnTap
+
 @Composable
 fun FarmerFormDialog(
     editingFarmer: Farmer?,
@@ -76,7 +78,8 @@ fun FarmerFormDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp),
+                .padding(horizontal = 20.dp)
+                .clearFocusOnTap(),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
             border = CardDefaults.outlinedCardBorder().copy(brush = androidx.compose.ui.graphics.SolidColor(AgriCardBorder))
@@ -84,6 +87,7 @@ fun FarmerFormDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clearFocusOnTap()
                     .padding(20.dp)
                     .verticalScroll(rememberScrollState())
             ) {

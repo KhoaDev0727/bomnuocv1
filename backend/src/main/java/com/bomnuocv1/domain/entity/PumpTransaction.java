@@ -14,14 +14,14 @@ public class PumpTransaction {
 
     private final UUID id;
     private final UUID ownerId;
-    private final UUID farmerId;
-    private final UUID pricingRuleId;
-    private final LocalDate transactionDate;
-    private final BigDecimal quantity;
-    private final String quantityUnit;
-    private final BigDecimal unitPrice;
-    private final BigDecimal amountDue;
-    private final String note;
+    private UUID farmerId;
+    private UUID pricingRuleId;
+    private LocalDate transactionDate;
+    private BigDecimal quantity;
+    private String quantityUnit;
+    private BigDecimal unitPrice;
+    private BigDecimal amountDue;
+    private String note;
     private boolean deleted;
     private final UUID clientUuid;
     private final Instant createdAt;
@@ -73,6 +73,30 @@ public class PumpTransaction {
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
+    }
+
+    public void updateDetails(
+            UUID farmerId,
+            UUID pricingRuleId,
+            LocalDate transactionDate,
+            BigDecimal quantity,
+            String quantityUnit,
+            BigDecimal unitPrice,
+            String note
+    ) {
+        if (farmerId != null) {
+            this.farmerId = farmerId;
+        }
+        this.pricingRuleId = pricingRuleId;
+        if (transactionDate != null) {
+            this.transactionDate = transactionDate;
+        }
+        this.quantity = quantity;
+        this.quantityUnit = quantityUnit;
+        this.unitPrice = unitPrice;
+        this.amountDue = (quantity != null && unitPrice != null) ? quantity.multiply(unitPrice) : BigDecimal.ZERO;
+        this.note = note;
+        this.updatedAt = Instant.now();
     }
 
     public void markDeleted() {

@@ -4,12 +4,18 @@ import com.bomnuocv1.domain.entity.PumpTransaction;
 import com.bomnuocv1.infrastructure.persistence.entity.PumpTransactionJpaEntity;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+
 @Component
 public class PumpTransactionPersistenceMapper {
 
     public PumpTransaction toDomain(PumpTransactionJpaEntity entity) {
         if (entity == null) {
             return null;
+        }
+        BigDecimal amountDue = entity.getAmountDue();
+        if (amountDue == null && entity.getQuantity() != null && entity.getUnitPrice() != null) {
+            amountDue = entity.getQuantity().multiply(entity.getUnitPrice());
         }
         return PumpTransaction.builder()
                 .id(entity.getId())
@@ -20,7 +26,7 @@ public class PumpTransactionPersistenceMapper {
                 .quantity(entity.getQuantity())
                 .quantityUnit(entity.getQuantityUnit())
                 .unitPrice(entity.getUnitPrice())
-                .amountDue(entity.getAmountDue())
+                .amountDue(amountDue)
                 .note(entity.getNote())
                 .deleted(entity.isDeleted())
                 .clientUuid(entity.getClientUuid())

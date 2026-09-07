@@ -200,7 +200,7 @@ fun HomeScreen(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Default.AddCircleOutline,
                         text = "Ghi lượt\nbơm mới",
-                        onClick = { /* Nav to new pump record */ }
+                        onClick = onNavigateToPumpLog
                     )
 
                     // Action 2: Thêm nông dân
@@ -225,7 +225,7 @@ fun HomeScreen(
                         icon = Icons.AutoMirrored.Filled.ReceiptLong,
                         iconTint = AgriGreenPrimary,
                         text = "Thu tiền\nnợ",
-                        onClick = { /* Nav to collect debt */ }
+                        onClick = onNavigateToDebtLedger
                     )
 
                     // Action 4: Báo cáo mùa vụ / Thiết lập đơn giá
@@ -258,7 +258,7 @@ fun HomeScreen(
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = AgriGreenPrimary,
-                        modifier = Modifier.clickable { /* View all transactions */ }
+                        modifier = Modifier.clickable { onNavigateToPumpLog() }
                     )
                 }
 

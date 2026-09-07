@@ -1,6 +1,20 @@
 package com.vn.bomnuocv1.presentation.navigation
 
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -11,17 +25,80 @@ import com.vn.bomnuocv1.presentation.debtledger.DebtLedgerScreen
 import com.vn.bomnuocv1.presentation.home.HomeBottomTab
 import com.vn.bomnuocv1.presentation.home.HomeScreen
 import com.vn.bomnuocv1.presentation.login.LoginScreen
+import com.vn.bomnuocv1.presentation.main.MainViewModel
 import com.vn.bomnuocv1.presentation.otp.OtpScreen
 import com.vn.bomnuocv1.presentation.pricing.PricingScreen
 import com.vn.bomnuocv1.presentation.pumplog.PumpLogScreen
 import com.vn.bomnuocv1.presentation.register.RegisterScreen
 import com.vn.bomnuocv1.presentation.settings.SettingsScreen
 import com.vn.bomnuocv1.presentation.splash.SplashScreen
+import com.vn.bomnuocv1.ui.theme.AgriGreenDark
+import com.vn.bomnuocv1.ui.theme.AgriGreenPrimary
+import com.vn.bomnuocv1.ui.theme.AgriOnSurfaceVariant
 
 @Composable
 fun AppNavigation(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    mainViewModel: MainViewModel = hiltViewModel()
 ) {
+    var showExpiredDialog by remember { mutableStateOf(false) }
+    var expiredMessage by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        mainViewModel.sessionExpiredEvent.collect { message ->
+            expiredMessage = message
+            showExpiredDialog = true
+        }
+    }
+
+    if (showExpiredDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showExpiredDialog = false
+                mainViewModel.resetExpirationState()
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(0) { inclusive = true }
+                }
+            },
+            title = {
+                Text(
+                    text = "Phiên đăng nhập hết hạn",
+                    fontWeight = FontWeight.Bold,
+                    color = AgriGreenDark
+                )
+            },
+            text = {
+                Text(
+                    text = expiredMessage.ifEmpty { "Phiên làm việc của bạn đã hết hạn do lâu ngày không sử dụng. Vui lòng đăng nhập lại để tiếp tục." },
+                    color = AgriOnSurfaceVariant
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showExpiredDialog = false
+                        mainViewModel.resetExpirationState()
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AgriGreenPrimary,
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = "Đăng nhập lại",
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            },
+            containerColor = Color.White,
+            shape = RoundedCornerShape(16.dp)
+        )
+    }
+
     val navigateToBottomTab: (HomeBottomTab) -> Unit = { tab ->
         val targetRoute = when (tab) {
             HomeBottomTab.HOME -> Screen.Home.route

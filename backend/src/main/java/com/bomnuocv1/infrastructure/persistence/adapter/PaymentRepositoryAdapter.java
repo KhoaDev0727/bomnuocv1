@@ -8,6 +8,7 @@ import com.bomnuocv1.infrastructure.persistence.repository.PaymentJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,5 +38,24 @@ public class PaymentRepositoryAdapter implements PaymentRepository {
         return paymentJpaRepository.findByOwnerId(ownerId).stream()
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Payment> findByTransactionId(UUID transactionId) {
+        return paymentJpaRepository.findByTransactionId(transactionId).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Payment> findByFarmerId(UUID farmerId) {
+        return paymentJpaRepository.findByFarmerId(farmerId).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public BigDecimal sumPaidByTransactionId(UUID transactionId) {
+        return paymentJpaRepository.sumPaidByTransactionId(transactionId);
     }
 }

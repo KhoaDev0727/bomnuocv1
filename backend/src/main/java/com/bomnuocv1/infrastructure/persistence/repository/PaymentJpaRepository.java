@@ -13,12 +13,21 @@ import java.util.UUID;
 @Repository
 public interface PaymentJpaRepository extends JpaRepository<PaymentJpaEntity, UUID> {
 
-    @Query("SELECT p FROM PaymentJpaEntity p WHERE p.ownerId = :ownerId ORDER BY p.createdAt DESC")
+    @Query("SELECT p FROM PaymentJpaEntity p WHERE p.ownerId = :ownerId AND p.deleted = false ORDER BY p.paymentDate DESC, p.createdAt DESC")
     List<PaymentJpaEntity> findByOwnerId(@Param("ownerId") UUID ownerId);
 
-    @Query("SELECT COALESCE(SUM(p.amount), 0) FROM PaymentJpaEntity p WHERE p.ownerId = :ownerId")
+    @Query("SELECT p FROM PaymentJpaEntity p WHERE p.transactionId = :transactionId AND p.deleted = false ORDER BY p.createdAt ASC")
+    List<PaymentJpaEntity> findByTransactionId(@Param("transactionId") UUID transactionId);
+
+    @Query("SELECT p FROM PaymentJpaEntity p WHERE p.farmerId = :farmerId AND p.deleted = false ORDER BY p.paymentDate DESC, p.createdAt DESC")
+    List<PaymentJpaEntity> findByFarmerId(@Param("farmerId") UUID farmerId);
+
+    @Query("SELECT COALESCE(SUM(p.amount), 0) FROM PaymentJpaEntity p WHERE p.transactionId = :transactionId AND p.deleted = false")
+    BigDecimal sumPaidByTransactionId(@Param("transactionId") UUID transactionId);
+
+    @Query("SELECT COALESCE(SUM(p.amount), 0) FROM PaymentJpaEntity p WHERE p.ownerId = :ownerId AND p.deleted = false")
     BigDecimal sumTotalPaidByOwnerId(@Param("ownerId") UUID ownerId);
 
-    @Query("SELECT p FROM PaymentJpaEntity p WHERE p.ownerId = :ownerId ORDER BY p.createdAt DESC")
+    @Query("SELECT p FROM PaymentJpaEntity p WHERE p.ownerId = :ownerId AND p.deleted = false ORDER BY p.createdAt DESC")
     List<PaymentJpaEntity> findTop10ByOwnerId(@Param("ownerId") UUID ownerId);
 }
