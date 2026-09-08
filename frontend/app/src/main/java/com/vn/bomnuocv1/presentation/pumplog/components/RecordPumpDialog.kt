@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -127,8 +130,9 @@ fun RecordPumpDialog(
     ) {
         Card(
             modifier = Modifier
-                .fillMaxWidth(0.94f)
-                .padding(vertical = 16.dp)
+                .fillMaxWidth(0.96f)
+                .fillMaxHeight(0.90f)
+                .padding(vertical = 8.dp)
                 .clearFocusOnTap(),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -136,11 +140,17 @@ fun RecordPumpDialog(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .clearFocusOnTap()
-                    .verticalScroll(rememberScrollState())
-                    .padding(20.dp)
             ) {
+                // Scrollable Content
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 14.dp)
+                ) {
                 // Header
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -311,6 +321,33 @@ fun RecordPumpDialog(
                     }
 
                     Spacer(modifier = Modifier.height(14.dp))
+                } else {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color(0xFFFFFBEB),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFDE68A))
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Info,
+                                contentDescription = null,
+                                tint = Color(0xFFD97706),
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Chưa có đơn giá áp dụng. Vui lòng vào mục 'Thiết lập đơn giá' để thêm đơn giá trước khi ghi lượt bơm.",
+                                fontSize = 12.sp,
+                                color = Color(0xFF92400E),
+                                lineHeight = 16.sp
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(14.dp))
                 }
 
                 // 3. Quantity & Unit
@@ -364,6 +401,7 @@ fun RecordPumpDialog(
                             onValueChange = {},
                             readOnly = true,
                             singleLine = true,
+                            placeholder = { Text("Chưa có biểu giá", color = Color(0xFF94A3B8), fontSize = 13.sp) },
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = AgriCardBorder,
@@ -383,26 +421,20 @@ fun RecordPumpDialog(
                 // 4. Unit Price & Transaction Date
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Column(modifier = Modifier.weight(1.1f)) {
+                    Column(modifier = Modifier.weight(1f)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = "Đơn giá (đ)",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color(0xFF1E293B)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "(biểu giá)",
-                                fontSize = 11.sp,
-                                color = Color(0xFF64748B)
+                                 text = "Đơn giá (đ)",
+                                 fontSize = 13.sp,
+                                 fontWeight = FontWeight.SemiBold,
+                                 color = Color(0xFF1E293B)
                             )
                         }
                         Spacer(modifier = Modifier.height(4.dp))
                         OutlinedTextField(
-                            value = if (unitPrice.isNotEmpty()) currencyFormatter.format(priceVal) else "0",
+                            value = if (unitPrice.isNotBlank() && priceVal > BigDecimal.ZERO) "${currencyFormatter.format(priceVal)} đ" else "0 đ",
                             onValueChange = {},
                             readOnly = true,
                             singleLine = true,
@@ -412,14 +444,14 @@ fun RecordPumpDialog(
                                 unfocusedBorderColor = AgriCardBorder,
                                 focusedContainerColor = Color(0xFFF8FAFC),
                                 unfocusedContainerColor = Color(0xFFF8FAFC),
-                                focusedTextColor = Color(0xFF0F172A),
-                                unfocusedTextColor = Color(0xFF0F172A)
+                                focusedTextColor = if (priceVal > BigDecimal.ZERO) Color(0xFF0F172A) else Color(0xFF94A3B8),
+                                unfocusedTextColor = if (priceVal > BigDecimal.ZERO) Color(0xFF0F172A) else Color(0xFF94A3B8)
                             ),
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
 
-                    Column(modifier = Modifier.weight(1.1f)) {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "Ngày bơm *",
                             fontSize = 13.sp,
@@ -427,38 +459,37 @@ fun RecordPumpDialog(
                             color = Color(0xFF1E293B)
                         )
                         Spacer(modifier = Modifier.height(4.dp))
-                        Box(modifier = Modifier.fillMaxWidth()) {
-                            OutlinedTextField(
-                                value = formatIsoToVietnameseDate(transactionDate),
-                                onValueChange = {},
-                                readOnly = true,
-                                singleLine = true,
-                                trailingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.CalendarToday,
-                                        contentDescription = "Chọn ngày",
-                                        tint = AgriGreenPrimary,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                },
-                                shape = RoundedCornerShape(12.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = AgriGreenPrimary,
-                                    unfocusedBorderColor = AgriCardBorder,
-                                    focusedContainerColor = Color(0xFFF8FAFC),
-                                    unfocusedContainerColor = Color(0xFFF8FAFC),
-                                    focusedTextColor = Color(0xFF0F172A),
-                                    unfocusedTextColor = Color(0xFF0F172A)
-                                ),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            // Transparent clickable layer to open date picker dialog
-                            Box(
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = Color(0xFFF8FAFC),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, AgriCardBorder),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable { showDatePicker = true }
+                        ) {
+                            Row(
                                 modifier = Modifier
-                                    .matchParentSize()
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .clickable { showDatePicker = true }
-                            )
+                                    .fillMaxSize()
+                                    .padding(horizontal = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = formatIsoToVietnameseDate(transactionDate),
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color(0xFF0F172A),
+                                    maxLines = 1
+                                )
+                                Icon(
+                                    imageVector = Icons.Default.CalendarToday,
+                                    contentDescription = "Chọn ngày",
+                                    tint = AgriGreenPrimary,
+                                    modifier = Modifier.size(17.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -487,7 +518,11 @@ fun RecordPumpDialog(
                                 color = AgriGreenDark
                             )
                             Text(
-                                text = "${quantity.ifEmpty { "0" }} × ${if (unitPrice.isNotEmpty()) currencyFormatter.format(priceVal) else "0"}đ",
+                                text = if (priceVal > BigDecimal.ZERO) {
+                                    "${quantity.ifEmpty { "0" }} × ${currencyFormatter.format(priceVal)}đ"
+                                } else {
+                                    "0 × 0đ (Chưa có đơn giá)"
+                                },
                                 fontSize = 11.sp,
                                 color = Color(0xFF475569)
                             )
@@ -497,7 +532,7 @@ fun RecordPumpDialog(
                             text = "${currencyFormatter.format(totalAmount)} đ",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = AgriGreenPrimary
+                            color = if (totalAmount > BigDecimal.ZERO) AgriGreenPrimary else Color(0xFF94A3B8)
                         )
                     }
                 }
@@ -598,10 +633,16 @@ fun RecordPumpDialog(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // Buttons
+                }
+
+                // Pinned Bottom Button Bar (Always visible inside dialog, never cut off)
+                HorizontalDivider(color = AgriCardBorder.copy(alpha = 0.6f), thickness = 1.dp)
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedButton(
                         onClick = onDismiss,

@@ -51,6 +51,8 @@ class PricingViewModel @Inject constructor(
             val allRules = allRulesRes.getOrDefault(emptyList())
 
             val defaultTestUnit = units.firstOrNull()
+            val initialRule = activeRules.firstOrNull { it.unitLabel == defaultTestUnit?.label }
+            val initialPrice = initialRule?.unitPrice?.toPlainString().orEmpty()
 
             _uiState.update {
                 it.copy(
@@ -58,6 +60,7 @@ class PricingViewModel @Inject constructor(
                     activeRules = activeRules,
                     allRules = allRules,
                     selectedTestUnit = defaultTestUnit,
+                    testUnitPrice = initialPrice,
                     isLoading = false
                 )
             }
@@ -71,24 +74,34 @@ class PricingViewModel @Inject constructor(
         recalculateTest()
     }
 
+    fun onTestUnitPriceChanged(newPrice: String) {
+        _uiState.update { it.copy(testUnitPrice = newPrice) }
+        recalculateTest()
+    }
+
     fun onTestUnitSelected(unit: LandUnitOption) {
-        _uiState.update { it.copy(selectedTestUnit = unit) }
+        val matchingRule = _uiState.value.activeRules.firstOrNull { it.unitLabel == unit.label }
+        val price = matchingRule?.unitPrice?.toPlainString().orEmpty()
+        _uiState.update {
+            it.copy(
+                selectedTestUnit = unit,
+                testUnitPrice = price
+            )
+        }
         recalculateTest()
     }
 
     private fun recalculateTest() {
         val qtyStr = _uiState.value.testQuantity.replace(",", ".").trim()
         val qty = qtyStr.toBigDecimalOrNull() ?: BigDecimal.ZERO
+        val priceStr = _uiState.value.testUnitPrice.replace(",", ".").trim()
+        val price = priceStr.toBigDecimalOrNull() ?: BigDecimal.ZERO
         val selectedUnit = _uiState.value.selectedTestUnit
 
-        // Find active price for this unit or fallback to default price
-        val activeRule = _uiState.value.activeRules.firstOrNull { it.unitLabel == selectedUnit?.label }
-        val price = activeRule?.unitPrice ?: selectedUnit?.defaultPrice ?: BigDecimal("90000")
-
-        val total = qty.multiply(price)
+        val total = if (price > BigDecimal.ZERO) qty.multiply(price) else BigDecimal.ZERO
         val symbols = DecimalFormatSymbols(Locale.GERMAN)
         val formatter = DecimalFormat("#,###", symbols)
-        val formatted = formatter.format(total) + " đ"
+        val formatted = "${formatter.format(total)} đ"
 
         val sqmMeters = selectedUnit?.squareMeters ?: BigDecimal.ZERO
         val totalM2 = if (sqmMeters > BigDecimal.ZERO) {
@@ -110,7 +123,7 @@ class PricingViewModel @Inject constructor(
     fun openEditDialog(rule: PricingRule? = null, prefillUnit: LandUnitOption? = null) {
         val type = rule?.pricingType?.code ?: (if (prefillUnit?.code == "HOUR") "per_hour" else "per_area")
         val label = rule?.unitLabel ?: (prefillUnit?.label ?: "công nhỏ (1.000m²)")
-        val price = rule?.unitPrice?.toPlainString() ?: (prefillUnit?.defaultPrice?.toPlainString() ?: "90000")
+        val price = rule?.unitPrice?.toPlainString() ?: ""
 
         _uiState.update {
             it.copy(

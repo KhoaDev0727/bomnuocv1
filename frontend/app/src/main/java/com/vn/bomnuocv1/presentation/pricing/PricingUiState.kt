@@ -16,6 +16,7 @@ data class PricingUiState(
     // Calculator tool state
     val testQuantity: String = "2.5",
     val selectedTestUnit: LandUnitOption? = null,
+    val testUnitPrice: String = "",
     val testTotalAmount: BigDecimal = BigDecimal.ZERO,
     val formattedTestTotal: String = "0 đ",
     val testAreaEquivalentM2: String = "",
@@ -24,7 +25,7 @@ data class PricingUiState(
     val showEditDialog: Boolean = false,
     val editingPricingType: String = "per_area",
     val editingUnitLabel: String = "công nhỏ (1.000m²)",
-    val editingPriceInput: String = "90000",
+    val editingPriceInput: String = "",
 
     // Delete confirmation dialog state
     val rulePendingDelete: PricingRule? = null,

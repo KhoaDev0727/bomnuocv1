@@ -78,7 +78,7 @@ fun FarmerFormDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 14.dp)
                 .clearFocusOnTap(),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -88,7 +88,7 @@ fun FarmerFormDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clearFocusOnTap()
-                    .padding(20.dp)
+                    .padding(18.dp)
                     .verticalScroll(rememberScrollState())
             ) {
                 // Header
@@ -206,15 +206,17 @@ fun FarmerFormDialog(
                 // Action Buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedButton(
                         onClick = onDismiss,
                         enabled = !isSaving,
                         modifier = Modifier
-                            .weight(1f)
+                            .weight(0.85f)
                             .height(48.dp),
                         shape = RoundedCornerShape(12.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp),
                         border = androidx.compose.foundation.BorderStroke(1.dp, AgriCardBorder),
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF475569))
                     ) {
@@ -230,7 +232,7 @@ fun FarmerFormDialog(
                         onClick = onSave,
                         isLoading = isSaving,
                         modifier = Modifier
-                            .weight(1f)
+                            .weight(1.15f)
                             .height(48.dp)
                     )
                 }

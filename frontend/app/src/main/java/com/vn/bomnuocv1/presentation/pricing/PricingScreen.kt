@@ -240,50 +240,81 @@ fun PricingScreen(
                         CircularProgressIndicator(color = AgriGreenPrimary)
                     }
                 } else {
-                    val activeList = uiState.activeRules.ifEmpty {
-                        listOf(
-                            PricingRule("1", "", com.vn.bomnuocv1.domain.model.PricingType.PER_AREA, "Theo diện tích", "công nhỏ (1.000m²)", java.math.BigDecimal("90000"), "90.000 đ", "Hôm nay", null, true, null),
-                            PricingRule("2", "", com.vn.bomnuocv1.domain.model.PricingType.PER_AREA, "Theo diện tích", "công lớn (1.296m²)", java.math.BigDecimal("115000"), "115.000 đ", "Hôm nay", null, true, null),
-                            PricingRule("3", "", com.vn.bomnuocv1.domain.model.PricingType.PER_HOUR, "Theo thời gian", "giờ", java.math.BigDecimal("60000"), "60.000 đ", "Hôm nay", null, true, null)
-                        )
-                    }
+                    val activeList = uiState.activeRules
 
-                    val visibleActiveRules = if (!uiState.isActiveRulesExpanded && activeList.size > 3) {
-                        activeList.take(3)
-                    } else {
-                        activeList
-                    }
-
-                    visibleActiveRules.forEach { rule ->
-                        ActivePricingRateCard(
-                            rule = rule,
-                            onEditClick = { viewModel.openEditDialog(rule) },
-                            onDeleteClick = { viewModel.requestDeletePricingRule(rule) }
-                        )
-                        Spacer(modifier = Modifier.height(10.dp))
-                    }
-
-                    if (activeList.size > 3) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp),
-                            horizontalArrangement = Arrangement.Center
+                    if (activeList.isEmpty()) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, AgriCardBorder)
                         ) {
-                            TextButton(onClick = viewModel::toggleActiveRulesExpanded) {
-                                Text(
-                                    text = if (uiState.isActiveRulesExpanded) "Thu gọn bớt" else "Xem thêm ${activeList.size - 3} đơn giá khác",
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = AgriGreenPrimary
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
                                 Icon(
-                                    imageVector = if (uiState.isActiveRulesExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                    imageVector = Icons.Default.PriceChange,
                                     contentDescription = null,
-                                    tint = AgriGreenPrimary,
-                                    modifier = Modifier.size(18.dp)
+                                    tint = Color(0xFF94A3B8),
+                                    modifier = Modifier.size(38.dp)
                                 )
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Text(
+                                    text = "Chưa có đơn giá nào đang áp dụng",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color(0xFF475569)
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = "Bấm 'Thêm đơn giá' ở góc phải để tạo mức giá cho trạm của bạn.",
+                                    fontSize = 12.sp,
+                                    color = Color(0xFF94A3B8),
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+                            }
+                        }
+                    } else {
+                        val visibleActiveRules = if (!uiState.isActiveRulesExpanded && activeList.size > 3) {
+                            activeList.take(3)
+                        } else {
+                            activeList
+                        }
+
+                        visibleActiveRules.forEach { rule ->
+                            ActivePricingRateCard(
+                                rule = rule,
+                                onEditClick = { viewModel.openEditDialog(rule) },
+                                onDeleteClick = { viewModel.requestDeletePricingRule(rule) }
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+
+                        if (activeList.size > 3) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                TextButton(onClick = viewModel::toggleActiveRulesExpanded) {
+                                    Text(
+                                        text = if (uiState.isActiveRulesExpanded) "Thu gọn bớt" else "Xem thêm ${activeList.size - 3} đơn giá khác",
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = AgriGreenPrimary
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Icon(
+                                        imageVector = if (uiState.isActiveRulesExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                        contentDescription = null,
+                                        tint = AgriGreenPrimary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
                             }
                         }
                     }
@@ -390,6 +421,50 @@ fun PricingScreen(
                                 }
                             }
                         }
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        // Unit Price Input for test calculation
+                        OutlinedTextField(
+                            value = uiState.testUnitPrice,
+                            onValueChange = viewModel::onTestUnitPriceChanged,
+                            label = { Text("Đơn giá tính thử (đ)") },
+                            placeholder = { Text("Nhập đơn giá (VD: 90000)", color = Color(0xFF94A3B8)) },
+                            trailingIcon = {
+                                Text(
+                                    text = "đ / ${uiState.selectedTestUnit?.displayName ?: "đơn vị"}",
+                                    color = Color(0xFF64748B),
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(end = 12.dp)
+                                )
+                            },
+                            supportingText = {
+                                val hasActiveRule = uiState.activeRules.any { it.unitLabel == uiState.selectedTestUnit?.label }
+                                if (hasActiveRule) {
+                                    Text(
+                                        text = "✓ Tự động lấy từ biểu giá đang áp dụng",
+                                        color = AgriGreenPrimary,
+                                        fontSize = 11.sp
+                                    )
+                                } else {
+                                    Text(
+                                        text = "Chưa có đơn giá áp dụng cho loại này — Bạn có thể tự nhập giá để tính thử",
+                                        color = Color(0xFF64748B),
+                                        fontSize = 11.sp
+                                    )
+                                }
+                            },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            singleLine = true,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = AgriGreenPrimary,
+                                focusedLabelColor = AgriGreenPrimary,
+                                unfocusedContainerColor = Color.White,
+                                focusedContainerColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        )
 
                         Spacer(modifier = Modifier.height(16.dp))
 

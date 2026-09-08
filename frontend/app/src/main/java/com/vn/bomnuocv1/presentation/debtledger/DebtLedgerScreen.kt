@@ -106,7 +106,7 @@ fun DebtLedgerScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Sổ nợ nông dân",
                         fontSize = 20.sp,
@@ -116,9 +116,12 @@ fun DebtLedgerScreen(
                     Text(
                         text = "Theo dõi công nợ và thanh toán bơm nước",
                         fontSize = 12.sp,
-                        color = Color(0xFF64748B)
+                        color = Color(0xFF64748B),
+                        maxLines = 1
                     )
                 }
+
+                Spacer(modifier = Modifier.width(8.dp))
 
                 Surface(
                     shape = RoundedCornerShape(20.dp),
@@ -126,21 +129,23 @@ fun DebtLedgerScreen(
                     border = androidx.compose.foundation.BorderStroke(1.dp, AgriMintBorder)
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.MenuBook,
                             contentDescription = null,
                             tint = AgriGreenDark,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(15.dp)
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "18 hộ nợ",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = AgriGreenDark
+                            color = AgriGreenDark,
+                            maxLines = 1,
+                            softWrap = false
                         )
                     }
                 }

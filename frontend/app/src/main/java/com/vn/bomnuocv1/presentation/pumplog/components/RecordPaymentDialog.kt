@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -107,8 +108,8 @@ fun RecordPaymentDialog(
     ) {
         Card(
             modifier = Modifier
-                .fillMaxWidth(0.94f)
-                .padding(vertical = 16.dp)
+                .fillMaxWidth(0.96f)
+                .padding(vertical = 12.dp)
                 .clearFocusOnTap(),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -119,7 +120,7 @@ fun RecordPaymentDialog(
                     .fillMaxWidth()
                     .clearFocusOnTap()
                     .verticalScroll(rememberScrollState())
-                    .padding(20.dp)
+                    .padding(horizontal = 16.dp, vertical = 18.dp)
             ) {
                 // Header
                 Row(
@@ -189,19 +190,23 @@ fun RecordPaymentDialog(
                                 color = Color(0xFF64748B)
                             )
                             Spacer(modifier = Modifier.height(4.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
+                            Text(
+                                text = "${selectedTransaction.quantity} ${selectedTransaction.quantityUnit} • Ngày bơm: ${formatIsoToVietnameseDate(selectedTransaction.transactionDate)}",
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color(0xFF0F172A)
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    text = "${selectedTransaction.quantity} ${selectedTransaction.quantityUnit} (${selectedTransaction.transactionDate})",
+                                    text = "Còn nợ: ",
                                     fontSize = 13.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = Color(0xFF0F172A)
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color(0xFF64748B)
                                 )
                                 Text(
-                                    text = "Còn nợ: ${currencyFormatter.format(selectedTransaction.remainingDebt)}đ",
-                                    fontSize = 13.sp,
+                                    text = "${currencyFormatter.format(selectedTransaction.remainingDebt)}đ",
+                                    fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = Color(0xFFDC2626)
                                 )
@@ -380,37 +385,36 @@ fun RecordPaymentDialog(
                     color = Color(0xFF1E293B)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
-                        value = formatIsoToVietnameseDate(paymentDate),
-                        onValueChange = {},
-                        readOnly = true,
-                        singleLine = true,
-                        trailingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.CalendarToday,
-                                contentDescription = "Chọn ngày",
-                                tint = AgriGreenPrimary,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = AgriGreenPrimary,
-                            unfocusedBorderColor = AgriCardBorder,
-                            focusedContainerColor = Color(0xFFF8FAFC),
-                            unfocusedContainerColor = Color(0xFFF8FAFC),
-                            focusedTextColor = Color(0xFF0F172A),
-                            unfocusedTextColor = Color(0xFF0F172A)
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Box(
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = Color(0xFFF8FAFC),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, AgriCardBorder),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable { showDatePicker = true }
+                ) {
+                    Row(
                         modifier = Modifier
-                            .matchParentSize()
-                            .clip(RoundedCornerShape(12.dp))
-                            .clickable { showDatePicker = true }
-                    )
+                            .fillMaxSize()
+                            .padding(horizontal = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = formatIsoToVietnameseDate(paymentDate),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF0F172A)
+                        )
+                        Icon(
+                            imageVector = Icons.Default.CalendarToday,
+                            contentDescription = "Chọn ngày",
+                            tint = AgriGreenPrimary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))

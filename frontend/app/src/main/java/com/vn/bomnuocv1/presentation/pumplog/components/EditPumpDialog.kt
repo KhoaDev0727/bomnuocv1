@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
@@ -19,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -84,7 +88,6 @@ fun EditPumpDialog(
     onDismiss: () -> Unit,
     onSave: () -> Unit
 ) {
-    var farmerDropdownExpanded by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
 
     val decimalSymbols = remember { DecimalFormatSymbols(Locale.GERMAN) }
@@ -111,8 +114,9 @@ fun EditPumpDialog(
     ) {
         Card(
             modifier = Modifier
-                .fillMaxWidth(0.94f)
-                .padding(vertical = 16.dp)
+                .fillMaxWidth(0.96f)
+                .fillMaxHeight(0.90f)
+                .padding(vertical = 8.dp)
                 .clearFocusOnTap(),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -120,11 +124,17 @@ fun EditPumpDialog(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .clearFocusOnTap()
-                    .verticalScroll(rememberScrollState())
-                    .padding(20.dp)
             ) {
+                // Scrollable Content
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 14.dp)
+                ) {
                 // Header
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -160,72 +170,55 @@ fun EditPumpDialog(
                     modifier = Modifier.padding(vertical = 12.dp)
                 )
 
-                // Select Farmer
-                Text(
-                    text = "Nông dân nhận bơm *",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF1E293B)
-                )
+                // Farmer (Fixed in Edit mode to prevent data inconsistency)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Nông dân nhận bơm",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF1E293B)
+                    )
+                }
                 Spacer(modifier = Modifier.height(6.dp))
 
                 val selectedFarmer = farmers.find { it.id == selectedFarmerId }
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    OutlinedButton(
-                        onClick = { farmerDropdownExpanded = true },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFF8FAFC)),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, AgriCardBorder)
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    color = Color(0xFFF1F5F9),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, AgriCardBorder)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null,
+                            tint = Color(0xFF64748B),
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column {
                             Text(
-                                text = selectedFarmer?.fullName ?: "Chọn nông dân...",
-                                color = if (selectedFarmer != null) Color(0xFF0F172A) else Color(0xFF94A3B8),
+                                text = selectedFarmer?.fullName ?: "Nông dân",
                                 fontSize = 14.sp,
-                                fontWeight = if (selectedFarmer != null) FontWeight.SemiBold else FontWeight.Normal
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF0F172A)
                             )
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = null,
-                                tint = Color(0xFF64748B)
-                            )
-                        }
-                    }
-
-                    DropdownMenu(
-                        expanded = farmerDropdownExpanded,
-                        onDismissRequest = { farmerDropdownExpanded = false },
-                        modifier = Modifier.fillMaxWidth(0.85f).background(Color.White)
-                    ) {
-                        farmers.forEach { farmer ->
-                            DropdownMenuItem(
-                                text = {
-                                    Column {
-                                        Text(
-                                            text = farmer.fullName,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color(0xFF0F172A),
-                                            fontSize = 14.sp
-                                        )
-                                        if (!farmer.phoneNumber.isNullOrBlank()) {
-                                            Text(
-                                                text = farmer.phoneNumber,
-                                                fontSize = 11.sp,
-                                                color = Color(0xFF64748B)
-                                            )
-                                        }
-                                    }
-                                },
-                                onClick = {
-                                    onFarmerSelected(farmer.id)
-                                    farmerDropdownExpanded = false
-                                }
-                            )
+                            if (!selectedFarmer?.phoneNumber.isNullOrBlank()) {
+                                Text(
+                                    text = selectedFarmer?.phoneNumber ?: "",
+                                    fontSize = 12.sp,
+                                    color = Color(0xFF64748B)
+                                )
+                            }
                         }
                     }
                 }
@@ -290,9 +283,9 @@ fun EditPumpDialog(
                 // Unit Price & Transaction Date
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Column(modifier = Modifier.weight(1.2f)) {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "Đơn giá (đ) *",
                             fontSize = 13.sp,
@@ -324,37 +317,37 @@ fun EditPumpDialog(
                             color = Color(0xFF1E293B)
                         )
                         Spacer(modifier = Modifier.height(4.dp))
-                        Box(modifier = Modifier.fillMaxWidth()) {
-                            OutlinedTextField(
-                                value = formatIsoToVietnameseDate(transactionDate),
-                                onValueChange = {},
-                                readOnly = true,
-                                singleLine = true,
-                                trailingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.CalendarToday,
-                                        contentDescription = "Chọn ngày",
-                                        tint = AgriGreenPrimary,
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                },
-                                shape = RoundedCornerShape(12.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = AgriGreenPrimary,
-                                    unfocusedBorderColor = AgriCardBorder,
-                                    focusedContainerColor = Color(0xFFF8FAFC),
-                                    unfocusedContainerColor = Color(0xFFF8FAFC),
-                                    focusedTextColor = Color(0xFF0F172A),
-                                    unfocusedTextColor = Color(0xFF0F172A)
-                                ),
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Box(
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = Color(0xFFF8FAFC),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, AgriCardBorder),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable { showDatePicker = true }
+                        ) {
+                            Row(
                                 modifier = Modifier
-                                    .matchParentSize()
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .clickable { showDatePicker = true }
-                            )
+                                    .fillMaxSize()
+                                    .padding(horizontal = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = formatIsoToVietnameseDate(transactionDate),
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color(0xFF0F172A),
+                                    maxLines = 1
+                                )
+                                Icon(
+                                    imageVector = Icons.Default.CalendarToday,
+                                    contentDescription = "Chọn ngày",
+                                    tint = AgriGreenPrimary,
+                                    modifier = Modifier.size(17.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -440,12 +433,16 @@ fun EditPumpDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                }
 
-                // Action Buttons
+                // Pinned Bottom Button Bar (Always visible inside dialog, never cut off)
+                HorizontalDivider(color = AgriCardBorder.copy(alpha = 0.6f), thickness = 1.dp)
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedButton(
                         onClick = onDismiss,

@@ -13,6 +13,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.vn.bomnuocv1.domain.model.PumpTransaction
+import com.vn.bomnuocv1.presentation.common.formatIsoToVietnameseDate
 import com.vn.bomnuocv1.ui.theme.AgriCardBorder
 import com.vn.bomnuocv1.ui.theme.AgriError
 
@@ -52,19 +54,10 @@ fun DeletePumpConfirmDialog(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
-                    text = "Bạn có chắc chắn muốn xóa lượt bơm của nông dân ${transaction.farmerFullName} (${transaction.quantity} ${transaction.quantityUnit} ngày ${transaction.transactionDate})?",
+                    text = "Bạn có chắc chắn muốn xóa lượt bơm của nông dân ${transaction.farmerFullName} (${transaction.quantity} ${transaction.quantityUnit} ngày ${formatIsoToVietnameseDate(transaction.transactionDate)})?",
                     fontSize = 13.sp,
                     color = Color(0xFF475569),
                     lineHeight = 18.sp
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Text(
-                    text = "Lưu ý: Giao dịch và các khoản thu trực tiếp liên quan sẽ được đưa vào lưu trữ xóa mềm để đảm bảo sổ nợ không bị sai lệch.",
-                    fontSize = 12.sp,
-                    color = Color(0xFF94A3B8),
-                    lineHeight = 16.sp
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -79,8 +72,9 @@ fun DeletePumpConfirmDialog(
                         shape = RoundedCornerShape(10.dp),
                         border = androidx.compose.foundation.BorderStroke(1.dp, AgriCardBorder),
                         modifier = Modifier
-                            .weight(1f)
-                            .height(44.dp)
+                            .weight(0.85f)
+                            .height(44.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp)
                     ) {
                         Text(text = "Hủy", color = Color(0xFF64748B), fontWeight = FontWeight.SemiBold)
                     }
@@ -94,13 +88,16 @@ fun DeletePumpConfirmDialog(
                             contentColor = Color.White
                         ),
                         modifier = Modifier
-                            .weight(1f)
-                            .height(44.dp)
+                            .weight(1.15f)
+                            .height(44.dp),
+                        contentPadding = PaddingValues(horizontal = 4.dp)
                     ) {
                         Text(
                             text = if (isDeleting) "Đang xóa..." else "Xóa lượt bơm",
                             fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
+                            fontSize = 13.sp,
+                            maxLines = 1,
+                            softWrap = false
                         )
                     }
                 }

@@ -37,7 +37,7 @@ data class PumpLogUiState(
     val formPricingRuleId: String? = null,
     val formTransactionDate: String = "",
     val formQuantity: String = "",
-    val formQuantityUnit: String = "công nhỏ (1.000m²)",
+    val formQuantityUnit: String = "",
     val formUnitPrice: String = "",
     val formInitialPaidAmount: String = "0",
     val formNote: String = "",

@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -311,7 +313,8 @@ fun AgriPrimaryButton(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(52.dp),
+            .heightIn(min = 48.dp),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 10.dp),
         enabled = enabled && !isLoading,
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
@@ -323,17 +326,19 @@ fun AgriPrimaryButton(
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(20.dp),
                 color = contentColor,
-                strokeWidth = 2.5.dp
+                strokeWidth = 2.dp
             )
         } else {
             Text(
                 text = text,
                 fontFamily = AppFontFamily,
-                fontSize = 16.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
-                color = contentColor
+                color = contentColor,
+                maxLines = 1,
+                softWrap = false
             )
         }
     }
@@ -370,7 +375,8 @@ fun OtpDigitBoxes(
                     
                     Box(
                         modifier = Modifier
-                            .size(width = 46.dp, height = 54.dp)
+                            .weight(1f)
+                            .aspectRatio(0.85f)
                             .clip(RoundedCornerShape(12.dp))
                             .background(AgriSurface)
                             .border(

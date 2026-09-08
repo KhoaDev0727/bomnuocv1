@@ -120,8 +120,8 @@ class PumpLogViewModel @Inject constructor(
                     formPricingRuleId = defaultRule?.id,
                     formTransactionDate = getTodayDateString(),
                     formQuantity = "",
-                    formQuantityUnit = defaultRule?.unitLabel ?: "công nhỏ (1.000m²)",
-                    formUnitPrice = defaultRule?.unitPrice?.toPlainString() ?: "90000",
+                    formQuantityUnit = defaultRule?.unitLabel.orEmpty(),
+                    formUnitPrice = defaultRule?.unitPrice?.toPlainString().orEmpty(),
                     formInitialPaidAmount = "0",
                     formNote = "",
                     formError = null
@@ -277,8 +277,8 @@ class PumpLogViewModel @Inject constructor(
         }
 
         val unitPrice = state.formUnitPrice.trim().toBigDecimalOrNull()
-        if (unitPrice == null || unitPrice < BigDecimal.ZERO) {
-            _uiState.update { it.copy(formError = "Đơn giá không hợp lệ.") }
+        if (state.formQuantityUnit.isBlank() || unitPrice == null || unitPrice <= BigDecimal.ZERO) {
+            _uiState.update { it.copy(formError = "Chưa có đơn giá áp dụng. Vui lòng chọn hoặc cài đặt đơn giá trong mục 'Thiết lập đơn giá' trước.") }
             return
         }
 
@@ -298,7 +298,7 @@ class PumpLogViewModel @Inject constructor(
                 pricingRuleId = state.formPricingRuleId,
                 transactionDate = date,
                 quantity = qty,
-                quantityUnit = state.formQuantityUnit.trim().ifEmpty { "công nhỏ" },
+                quantityUnit = state.formQuantityUnit.trim(),
                 unitPrice = unitPrice,
                 initialPaidAmount = initialPaid,
                 note = state.formNote.trim().ifEmpty { null }
